@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gocd-server
+  annotations:
+    openshift.io/display-name: GoCD Server
+    description: 'Runs the GoCD Server for infrastructure'
+    tags: ci-cd,gocd
+  message: ''
+  labels:
+    app: gocd-server
+spec:
+  ports:
+    - name: "8153-tcp"
+      port: 8153
+      protocol: TCP
+      targetPort: 8153
+    - name: "8154-tcp"
+      port: 8154
+      protocol: TCP
+      targetPort: 8154
+  selector:
+    deploymentconfig: gocd-server
+  sessionAffinity: None
+  type: ClusterIP

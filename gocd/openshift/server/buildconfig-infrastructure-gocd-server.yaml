@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: gocd-server
+  labels:
+    build: gocd-server
+spec:
+  successfulBuildsHistoryLimit: 1
+  failedBuildsHistoryLimit: 1
+  runPolicy: Serial
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/suttiruk046/infrastructure.git'
+    contextDir: gocd/gocd-server
+    sourceSecret:
+      name: github-secret
+  strategy:
+    type: Docker
+    dockerStrategy:
+      noCache: false
+      forcePull: false
+      env:
+        - name: GO_SERVER_SYSTEM_PROPERTIES
+          value: '-Xmx2048mb'
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'gocd-server:latest'
+  resources: {}
+  postCommit: {}
+  nodeSelector: null

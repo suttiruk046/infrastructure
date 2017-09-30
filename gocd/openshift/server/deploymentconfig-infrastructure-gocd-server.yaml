@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: gocd-server
+  labels:
+    app: gocd-server
+    role: infrastructure-ci
+spec:
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: false
+        containerNames:
+          - gocd-server
+        from:
+          kind: ImageStreamTag
+          name: 'gocd-server:latest'
+  replicas: 1
+  test: false
+  selector:
+    app: gocd-server
+    deploymentconfig: gocd-server
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: gocd-server
+        deploymentconfig: gocd-server
+    spec:
+      containers:
+        - name: gocd-server
+          image: >-
+            openshift/gocd-server:latest
+          ports:
+            - containerPort: 8153
+              protocol: TCP
+            - containerPort: 8154
+              protocol: TCP
+          env:
+            - name: GO_SERVER_SYSTEM_PROPERTIES
+              value: '-Xmx2048mb'
+            - name: GOCD_AGENT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: infrastructure-gocd
+                  key: GOCD_AGENT_SECRET
+            - name: GIT_COMMITTER_NAME
+              value: gocd
+            - name: GIT_COMMITTER_EMAIL
+              value: gocd@localhost
+            - name: GOCD_GITHUB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: infrastructure-gocd
+                  key: GOCD_GITHUB_USERNAME
+            - name: GOCD_GITHUB_ACCESS_TOKEN
+              valueFrom:
+                configMapKeyRef:
+                  name: infrastructure-gocd
+                  key: GOCD_GITHUB_ACCESS_TOKEN
+          resources:
+            requests:
+              cpu: '1'
+              memory: 3Gi
+            limits:
+              cpu: 1500m
+              memory: 3Gi
+          readinessProbe:
+            tcpSocket:
+              port: 8154
+            initialDelaySeconds: 240
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 8154
+            initialDelaySeconds: 240
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          imagePullPolicy: Always
+          volumeMounts:
+          - mountPath: /var/lib/go-server
+            name: gocd-server-volume
+      volumes:
+      - name: gocd-server-volume
+        persistentVolumeClaim:
+          claimName: "gocd-server"
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      serviceAccount: infrastructure-ci
+      serviceAccountName: infrastructure-ci

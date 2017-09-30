@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+  name: gocd-server
+  annotations:
+    description: ImageStream for gocd-server
+  labels:
+    build: gocd-server

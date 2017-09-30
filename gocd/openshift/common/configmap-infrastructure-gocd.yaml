@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: infrastructure-gocd
+data:
+  GOCD_GITHUB_USERNAME: <username>
+  GOCD_GITHUB_ACCESS_TOKEN: <git-token>
+  GOCD_AGENT_SECRET: the-secret-is-devops

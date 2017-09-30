@@ -17,4 +17,4 @@ oc replace --namespace=${oc_namespace} -f gocd/openshift/server/deploymentconfig
 oc replace --namespace=${oc_namespace} -f gocd/openshift/server/imagestream-infrastructure-gocd-server.yaml
 oc create  --namespace=${oc_namespace} -f gocd/openshift/server/persistentvolumeclaim-infrastructure-gocd-server.yaml || true
 oc replace --namespace=${oc_namespace} -f gocd/openshift/server/route-infrastructure-gocd-server.yaml
-oc replace --namespace=${oc_namespace} -f gocd/openshift/server/service-infrastructure-gocd-server.yaml
+oc apply --namespace=${oc_namespace} -f gocd/openshift/server/service-infrastructure-gocd-server.yaml

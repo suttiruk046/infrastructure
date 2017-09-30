@@ -6,14 +6,11 @@ metadata:
     app: gocd-server
     router: internet-router
 spec:
-  host: gocd-server-dev.paas.com
+  host: gocd-server-infrastructure.127.0.0.1.nip.io
+  port:
+    targetPort: 8153-tcp
   to:
     kind: Service
     name: gocd-server
     weight: 100
-  port:
-    targetPort: 8153-tcp
-  tls:
-    termination: edge
-    insecureEdgeTerminationPolicy: Redirect
   wildcardPolicy: None

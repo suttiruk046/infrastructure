@@ -1,0 +1,109 @@
+pipelines:
+  setup_gocd:
+    group: infrastructure_gocd
+    label_template: "${git[:8]}"
+    locking: "on"
+    timer:
+      spec: "* * * * * ? *"
+      only_on_changes: yes
+    tracking_tool:
+      link: "https://github.com/suttiruk046/infrastructure/issues/${ID}"
+      regex: "#(\\d+)"
+    environment_variables:
+      oc_namespace: infrastructure
+      oc_namespace_alias: dev
+    materials:
+      git:
+        git: https://github.com/suttiruk046/infrastructure.git
+        branch: master
+        auto_update: true
+        shallow_clone: true
+        whitelist:
+          - gocd/**/*.*
+    stages:
+      - verify:
+          jobs:
+            verify_repository:
+              artifacts:
+                - build:
+                    source: gocd/scripts/pipeline/
+              tasks:
+                - script: |
+                    bash -e gocd/scripts/pipeline/verify_repository.sh
+            verify_openshift:
+              artifacts:
+                - build:
+                    source: gocd/openshift/
+              tasks:
+                - script: |
+                    bash -e gocd/scripts/pipeline/verify_openshift.sh
+      - setup:
+          tasks:
+            - script: |
+                bash -e gocd/scripts/pipeline/setup.sh
+
+  setup_gocd_agent:
+    group: infrastructure_gocd
+    label_template: "${upstream}"
+    locking: "on"
+    tracking_tool:
+      link: "https://github.com/suttiruk046/infrastructure/issues${ID}"
+      regex: "#(\\d+)"
+    environment_variables:
+      oc_namespace: infrastructure
+      oc_namespace_alias: dev
+    materials:
+      upstream:
+        pipeline: setup_gocd
+        stage: verify
+    stages:
+      - deploy:
+          approval:
+            type: manual
+          tasks:
+            - fetch:
+                pipeline: setup_gocd
+                stage: verify
+                job: verify_repository
+                source: gocd/scripts/pipeline/
+                destination: gocd/scripts/
+            - fetch:
+                pipeline: setup_gocd
+                stage: verify
+                job: verify_openshift
+                source: gocd/openshift/
+            - script: |
+                bash -e gocd/scripts/pipeline/deploy_agent.sh
+
+  setup_gocd_server:
+    group: api_infrastructure_gocd
+    label_template: "${upstream}"
+    locking: "on"
+    tracking_tool:
+      link: "https://github.com/suttiruk046/infrastructure/issues/${ID}"
+      regex: "#(\\d+)"
+    environment_variables:
+      oc_namespace: infrastructure
+      oc_namespace_alias: dev
+    materials:
+      upstream:
+        pipeline: setup_gocd
+        stage: verify
+    stages:
+      - deploy:
+          approval:
+            type: manual
+          tasks:
+            - fetch:
+                pipeline: setup_gocd
+                stage: verify
+                job: verify_repository
+                source: gocd/scripts/pipeline/
+                destination: gocd/scripts/
+            - fetch:
+                pipeline: setup_gocd
+                stage: verify
+                job: verify_openshift
+                source: gocd/openshift/
+            - script: |
+                bash -e gocd/scripts/pipeline/deploy_server.sh

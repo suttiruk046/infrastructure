@@ -6,6 +6,7 @@ set -eu
 oc delete --namespace=${oc_namespace} --cascade=true bc/gocd-server || true
 
 oc replace --namespace=${oc_namespace} -f gocd/openshift/common/configmap-infrastructure-gocd.yaml
+oc replace --namespace=${oc_namespace} -f gocd/openshift/common/serveraccount-infrastructure-gocd.yaml
 
 oc replace --force --namespace=${oc_namespace} -f gocd/openshift/agent/buildconfig-infrastructure-gocd-agent.yaml
 oc replace --namespace=${oc_namespace} -f gocd/openshift/agent/deploymentconfig-infrastructure-gocd-agent.yaml

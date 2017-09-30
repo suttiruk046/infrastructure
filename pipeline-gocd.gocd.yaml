@@ -76,7 +76,7 @@ pipelines:
                 bash -e gocd/scripts/pipeline/deploy_agent.sh
 
   setup_gocd_server:
-    group: api_infrastructure_gocd
+    group: infrastructure_gocd
     label_template: "${upstream}"
     locking: "on"
     tracking_tool:

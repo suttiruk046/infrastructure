@@ -25,7 +25,7 @@ spec:
         from:
           kind: ImageStreamTag
           name: 'gocd-agent:latest'
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 1
   test: false
   selector:

@@ -1,6 +1,6 @@
 pipelines:
   sb-helloworld: # definition of pipeline (with repo prefix?)
-    group: infrastructure # note that the group name can contain only of alphanumeric & underscore characters
+    group: sb-helloworld # note that the group name can contain only of alphanumeric & underscore characters
     label_template: "${git[:8]}"
     locking: off
     timer:

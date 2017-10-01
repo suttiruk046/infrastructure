@@ -1,0 +1,50 @@
+pipelines:
+  sb-helloworld: # definition of pipeline (with repo prefix?)
+    group: infrastructure # note that the group name can contain only of alphanumeric & underscore characters
+    label_template: "${git[:8]}"
+    locking: off
+    timer:
+      spec: "0 15 10 * * ? *"
+      only_on_changes: yes
+    tracking_tool:
+      link: "https://github.com/suttiruk046/infrastructure/issues/${ID}"
+      regex: "#(\\d+)"
+    environment_variables:
+      oc_namespace: infrastructure
+      oc_namespace_alias: dev
+      oc_application: sb-helloworld
+    materials:
+      git: # this is the name of material, the name can contain only of alphanumeric & underscore characters
+        git: https://github.com/suttiruk046/sb-helloworld.git
+        branch: master
+        auto_update: true
+        shallow_clone: true
+    stages: # list of stages in order
+      - verify_openshift:
+          tasks:
+            - script: |
+                oc apply --dry-run=true \
+                         --filename=openshift/ \
+                         --namespace=${oc_namespace}
+      - setup:
+          tasks:
+            - script: |
+                oc apply -f openshift/imagestream.yaml
+                oc apply -f openshift/buildconfig.yaml
+                oc apply -f openshift/deploymentconfig.yaml
+                oc apply -f openshift/route.yaml
+                oc apply -f openshift/service.yaml
+
+      - build:
+          tasks:
+            - script: |
+                oc start-build api-leads --follow
+                oc tag ${oc_namespace}/${oc_application}:latest \
+                       ${oc_namespace}/${oc_application}:${GO_PIPELINE_LABEL}
+      
+      - deploy:
+          approval: manual
+          tasks:
+            - script: |
+                oc rollout latest dc/${oc_application} -n ${oc_namespace}
+                oc rollout status dc/${oc_application}

@@ -2,6 +2,8 @@
 
 set -eu
 
+for resource in $(oc get build | grep gocd-server | grep -o '^\S\+'); do oc delete build $resource; done
+
 oc start-build bc/gocd-server \
                --follow \
                --namespace=${oc_namespace}

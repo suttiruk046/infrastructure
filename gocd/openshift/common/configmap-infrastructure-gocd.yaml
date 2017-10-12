@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: infrastructure-gocd
 data:
-  GOCD_GITHUB_USERNAME: <username>
-  GOCD_GITHUB_ACCESS_TOKEN: <git-token>
+  GOCD_GITHUB_USERNAME: suttiruk046
+  GOCD_GITHUB_ACCESS_TOKEN: c9de39c7b03aa341c7969c5c210244f579915bb5
   GOCD_AGENT_SECRET: the-secret-is-devops

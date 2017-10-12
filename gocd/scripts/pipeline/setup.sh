@@ -11,7 +11,6 @@ oc replace --namespace=${oc_namespace} -f gocd/openshift/common/rolebiding-infra
 
 oc replace --force --namespace=${oc_namespace} -f gocd/openshift/agent/buildconfig-infrastructure-gocd-agent.yaml
 oc replace --namespace=${oc_namespace} -f gocd/openshift/agent/deploymentconfig-infrastructure-gocd-agent.yaml
-oc replace --namespace=${oc_namespace} -f gocd/openshift/agent/horizontalpodautoscaler-infrastructure-gocd-agent.yaml
 oc replace --namespace=${oc_namespace} -f gocd/openshift/agent/imagestream-infrastructure-gocd-agent.yaml
 
 oc replace --force --namespace=${oc_namespace} -f gocd/openshift/server/buildconfig-infrastructure-gocd-server.yaml

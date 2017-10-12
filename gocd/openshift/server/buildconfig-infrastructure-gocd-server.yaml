@@ -22,7 +22,7 @@ spec:
       forcePull: false
       env:
         - name: GO_SERVER_SYSTEM_PROPERTIES
-          value: '-Xmx2048mb'
+          value: '-Xmx512mb'
   output:
     to:
       kind: ImageStreamTag
